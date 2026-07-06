@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_GITHUB_USER/version-color-gitops-demo.git
+    repoURL: https://github.com/stephsc30/version-color-gitops-demo.git
     targetRevision: main
     path: chart
     helm:
