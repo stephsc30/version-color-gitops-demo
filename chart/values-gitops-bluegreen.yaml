@@ -2,4 +2,4 @@ strategy: bluegreen
 
 image:
   repository: stephsc30/version-color-demo
-  tag: v1
+  tag: v2
