@@ -1,0 +1,43 @@
+replicaCount: 4
+
+image:
+  repository: YOUR_DOCKERHUB_USER/version-color-demo
+  tag: v1
+  pullPolicy: IfNotPresent
+
+app:
+  name: GitOps Version Color Demo
+  port: 8080
+
+# Allowed values: canary, bluegreen
+strategy: canary
+
+gateway:
+  name: node-gateway
+  namespace: istio-gateway
+
+routes:
+  canaryPath: /canary
+  blueGreenActivePath: /bluegreen/active
+  blueGreenPreviewPath: /bluegreen/preview
+
+canary:
+  steps:
+    - setWeight: 20
+    - pause:
+        duration: 30s
+    - setWeight: 40
+    - pause:
+        duration: 30s
+    - setWeight: 60
+    - pause:
+        duration: 30s
+    - setWeight: 80
+    - pause:
+        duration: 30s
+
+blueGreen:
+  autoPromotionEnabled: false
+  scaleDownDelaySeconds: 60
+
+resources: {}

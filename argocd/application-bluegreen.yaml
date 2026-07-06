@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: version-color-bluegreen
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USER/version-color-gitops-demo.git
+    targetRevision: main
+    path: chart
+    helm:
+      releaseName: version-color-bluegreen
+      valueFiles:
+        - values.yaml
+        - values-gitops-bluegreen.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

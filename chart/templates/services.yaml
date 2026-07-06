@@ -1,0 +1,61 @@
+{{- if eq .Values.strategy "canary" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-stable
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: canary
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-canary
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: canary
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+{{- else if eq .Values.strategy "bluegreen" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-active
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: bluegreen
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-preview
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: bluegreen
+spec:
+  selector:
+    app.kubernetes.io/name: {{ .Release.Name }}
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+{{- end }}

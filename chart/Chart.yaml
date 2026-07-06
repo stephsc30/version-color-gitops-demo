@@ -1,0 +1,6 @@
+apiVersion: v2
+name: version-color-demo
+description: Demo app for Argo Rollouts canary and blue-green with Istio Gateway API.
+type: application
+version: 0.1.0
+appVersion: v1

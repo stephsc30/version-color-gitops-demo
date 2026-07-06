@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: version-color-canary
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USER/version-color-gitops-demo.git
+    targetRevision: main
+    path: chart
+    helm:
+      releaseName: version-color-canary
+      valueFiles:
+        - values.yaml
+        - values-gitops-canary.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: version-color-canary-route
+      namespace: gitops-demo
+      jsonPointers:
+        - /spec/rules/0/backendRefs/0/weight
+        - /spec/rules/0/backendRefs/1/weight

@@ -1,0 +1,70 @@
+{{- if eq .Values.strategy "canary" }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-route
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: canary
+spec:
+  parentRefs:
+    - name: {{ .Values.gateway.name }}
+      namespace: {{ .Values.gateway.namespace }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.routes.canaryPath }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ .Release.Name }}-stable
+          port: 80
+          weight: 100
+        - name: {{ .Release.Name }}-canary
+          port: 80
+          weight: 0
+{{- else if eq .Values.strategy "bluegreen" }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-route
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/strategy: bluegreen
+spec:
+  parentRefs:
+    - name: {{ .Values.gateway.name }}
+      namespace: {{ .Values.gateway.namespace }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.routes.blueGreenActivePath }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ .Release.Name }}-active
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.routes.blueGreenPreviewPath }}
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: {{ .Release.Name }}-preview
+          port: 80
+{{- end }}
